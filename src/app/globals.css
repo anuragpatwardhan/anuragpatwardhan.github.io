@@ -1,0 +1,296 @@
+@import "tailwindcss";
+
+@theme {
+  /* exact tokens from anuragpatwardhan.framer.website */
+  --color-bg: #050000;
+  --color-bg-cream: #f5f1eb;
+  --color-bg-wine: #5b2333;
+  --color-ink: #ede1e1;
+  --color-ink-dim: #3d3d3d;
+  --color-ink-soft: rgba(255, 255, 255, 0.8);
+  --color-accent: #f4e87a;
+  --color-accent-bright: #d8ff3a;
+  --color-link: #0099ff;
+  --font-display: var(--font-display), "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-sans), "Inter", system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #000;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 125%;
+  letter-spacing: -0.055em;
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+
+.pill {
+  border-radius: 9999px;
+}
+
+.nav-card {
+  background: #fff;
+  color: #000;
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.nav-card.is-scrolled {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* page-top blur halo that grows with scroll — sits behind the nav */
+.nav-halo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  pointer-events: none;
+  z-index: 40;
+  background: linear-gradient(180deg, rgba(5, 0, 0, 0.85) 0%, rgba(5, 0, 0, 0.4) 60%, transparent 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.nav-halo.is-visible {
+  opacity: 1;
+}
+
+.glass-pill {
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-white {
+  background: #fff;
+  color: #0a0a0a;
+  border-radius: 28px;
+}
+
+.skill-pill {
+  background: #0a0a0a;
+  color: #fff;
+  border: 1px solid #2a2a2a;
+  border-radius: 9999px;
+  padding: 12px 22px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+/* halftone hero backdrop */
+.hero-halftone {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1.2px, transparent 1.4px);
+  background-size: 8px 8px;
+  mask-image: radial-gradient(ellipse at 70% 50%, #000 0%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 50%, #000 0%, transparent 65%);
+}
+
+/* radial glow for CTA section, with a long fade to pure black at the bottom so it blends into the footer */
+.glow-yellow {
+  background:
+    linear-gradient(to bottom, transparent 0%, transparent 55%, #050000 95%),
+    radial-gradient(ellipse 55% 45% at 50% 42%, #f4e87a 0%, #c9a92e 22%, transparent 70%),
+    #050000;
+}
+
+/* cinematic animated mesh background — slow drifting color blobs on near-black */
+.mesh-bg {
+  background:
+    radial-gradient(40% 50% at 15% 25%, rgba(120, 60, 200, 0.35) 0%, transparent 60%),
+    radial-gradient(45% 55% at 85% 30%, rgba(30, 90, 200, 0.30) 0%, transparent 65%),
+    radial-gradient(50% 60% at 70% 85%, rgba(244, 232, 122, 0.18) 0%, transparent 65%),
+    radial-gradient(40% 50% at 20% 80%, rgba(216, 60, 100, 0.22) 0%, transparent 60%),
+    #050505;
+  filter: saturate(1.05);
+  animation: mesh-drift 22s ease-in-out infinite alternate;
+}
+
+@keyframes mesh-drift {
+  0%   { background-position: 0% 0%,   0% 0%,   0% 0%,   0% 0%, 0 0; transform: scale(1);    }
+  50%  { background-position: 4% -3%, -3% 4%,  -2% 3%,   3% -2%, 0 0; transform: scale(1.04); }
+  100% { background-position: -3% 4%,  4% -3%,  3% -2%, -3% 4%, 0 0; transform: scale(1.02); }
+}
+
+/* film grain overlay — pure SVG noise, no asset needed */
+.grain {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  animation: grain-shift 1.6s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-2%, 1%); }
+  40%  { transform: translate(1%, -2%); }
+  60%  { transform: translate(-1%, 2%); }
+  80%  { transform: translate(2%, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-bg, .grain { animation: none; }
+}
+
+/* ---------- Unified Button System ---------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.45s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.btn:hover { transform: translateY(-2px) scale(1.03); }
+.btn:active { transform: translateY(0) scale(0.97); transition-duration: 0.12s; }
+
+/* shimmer sweep — diagonal highlight that flies across on hover */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  transform: skewX(-22deg);
+  pointer-events: none;
+  z-index: 1;
+  transition: left 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+}
+.btn:hover::before { left: 130%; }
+
+/* keep label/icon above shimmer */
+.btn > * { position: relative; z-index: 2; }
+
+/* arrow icon nudge on hover */
+.btn .btn-arrow { transition: transform 0.3s cubic-bezier(0.21, 0.47, 0.32, 0.98); }
+.btn:hover .btn-arrow { transform: translate(3px, -3px); }
+
+/* variants */
+.btn-primary {
+  background: #f4e87a;
+  color: #050000;
+  box-shadow: 0 8px 24px -8px rgba(244, 232, 122, 0.45);
+}
+.btn-primary:hover {
+  box-shadow:
+    0 0 0 4px rgba(244, 232, 122, 0.15),
+    0 18px 50px -8px rgba(244, 232, 122, 0.7),
+    0 0 60px -10px rgba(244, 232, 122, 0.6);
+}
+
+.btn-glass {
+  background: rgba(20, 20, 20, 0.55);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.btn-glass:hover {
+  background: rgba(40, 40, 40, 0.7);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 18px 50px -10px rgba(0, 0, 0, 0.7);
+}
+
+.btn-light {
+  background: #fff;
+  color: #050000;
+  box-shadow: 0 8px 20px -8px rgba(255, 255, 255, 0.4);
+}
+.btn-light:hover {
+  background: #fafafa;
+  box-shadow: 0 18px 50px -10px rgba(255, 255, 255, 0.5);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* hero CTA breathing pulse — pulls the eye */
+.btn-breathing {
+  animation: breathe 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(244, 232, 122, 0.5),
+      0 12px 40px -8px rgba(244, 232, 122, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 14px rgba(244, 232, 122, 0),
+      0 18px 60px -8px rgba(244, 232, 122, 0.7);
+  }
+}
+
+/* floating sticky CTA — appears once you scroll past hero */
+.float-cta {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 60;
+  transform: translateY(120%) scale(0.9);
+  opacity: 0;
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.4s ease;
+}
+.float-cta.is-visible {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-breathing { animation: none; }
+  .btn, .btn::before, .btn .btn-arrow { transition: none; }
+}
