@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CustomCursor() {
   const x = useMotionValue(-100);
@@ -20,16 +20,27 @@ export default function CustomCursor() {
   const [visible, setVisible] = useState(false);
   const [supportsFinePointer, setSupportsFinePointer] = useState(false);
 
+  // Mirrors `visible` so the pointer handlers can check it without the effect
+  // depending on it — otherwise the first mouse move would tear down and
+  // re-register every listener below.
+  const visibleRef = useRef(false);
+
   useEffect(() => {
     const fineQuery = window.matchMedia("(pointer: fine)");
     setSupportsFinePointer(fineQuery.matches);
     const onFineChange = (e: MediaQueryListEvent) => setSupportsFinePointer(e.matches);
     fineQuery.addEventListener("change", onFineChange);
 
+    const setVisibility = (next: boolean) => {
+      if (visibleRef.current === next) return;
+      visibleRef.current = next;
+      setVisible(next);
+    };
+
     const onMove = (e: MouseEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
-      if (!visible) setVisible(true);
+      setVisibility(true);
     };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
@@ -42,8 +53,8 @@ export default function CustomCursor() {
     };
     const onDown = () => setPressed(true);
     const onUp = () => setPressed(false);
-    const onLeave = () => setVisible(false);
-    const onEnter = () => setVisible(true);
+    const onLeave = () => setVisibility(false);
+    const onEnter = () => setVisibility(true);
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
@@ -61,7 +72,7 @@ export default function CustomCursor() {
       document.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("mouseenter", onEnter);
     };
-  }, [x, y, visible]);
+  }, [x, y]);
 
   // bail out on touch devices entirely
   if (!supportsFinePointer) return null;
