@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 import { personalIntro, interests, communitySnapshot } from "@/data/personal";
@@ -10,31 +11,51 @@ export const metadata = {
 export default function PersonalPage() {
   return (
     <main className="bg-[#050000] text-white">
-      <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-25 [background:radial-gradient(60%_60%_at_50%_0%,#d8ff3a_0%,transparent_60%)]" />
-        <div className="relative max-w-6xl mx-auto px-6 md:px-10">
+      <section className="relative isolate pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[88vh] flex items-end">
+        {/* Background photo */}
+        <Image
+          src="/images/hero.jpeg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[center_72%] absolute inset-0 z-0"
+        />
+        {/* Light black overlay: lighter in the upper middle so the face stays the focal point, hits fully opaque #050000 well before the section ends so there is no visible seam */}
+        <div
+          aria-hidden
+          className="absolute inset-0 z-[1] bg-[linear-gradient(to_bottom,rgba(5,0,0,0.5)_0%,rgba(5,0,0,0.22)_28%,rgba(5,0,0,0.55)_60%,#050000_85%,#050000_100%)]"
+        />
+        {/* extra soft yellow-green glow accent so it stays on brand */}
+        <div className="pointer-events-none absolute inset-0 z-[2] opacity-15 [background:radial-gradient(45%_30%_at_50%_82%,#d8ff3a_0%,transparent_70%)]" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-10 w-full">
           <Reveal>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm tracking-[0.12em] uppercase text-white/60 hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-sm tracking-[0.12em] uppercase text-white/70 hover:text-white transition-colors"
             >
               <BackArrow />
               Home
             </Link>
           </Reveal>
           <Reveal delay={0.05}>
-            <p className="mt-8 text-xs md:text-sm tracking-[0.18em] uppercase text-white/50">{personalIntro.title}</p>
+            <p className="mt-8 text-xs md:text-sm tracking-[0.18em] uppercase text-white/65">{personalIntro.title}</p>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="display mt-4 text-[clamp(2.5rem,8vw,6rem)] text-[#ede1e1] leading-[0.95]">
+            <h1 className="display mt-4 text-[clamp(2.5rem,8vw,6rem)] text-[#ede1e1] leading-[0.95] drop-shadow-[0_4px_28px_rgba(0,0,0,0.55)]">
               The Off-Screen Me
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-6 max-w-3xl text-white/75 text-lg md:text-xl leading-relaxed">{personalIntro.tagline}</p>
+            <p className="mt-6 max-w-3xl text-white/90 text-lg md:text-xl leading-relaxed drop-shadow-[0_2px_14px_rgba(0,0,0,0.6)]">
+              {personalIntro.tagline}
+            </p>
           </Reveal>
           <Reveal delay={0.25}>
-            <p className="mt-4 max-w-3xl text-white/55 text-sm md:text-base leading-relaxed">{personalIntro.pitch}</p>
+            <p className="mt-4 max-w-3xl text-white/75 text-sm md:text-base leading-relaxed drop-shadow-[0_2px_14px_rgba(0,0,0,0.5)]">
+              {personalIntro.pitch}
+            </p>
           </Reveal>
         </div>
       </section>
