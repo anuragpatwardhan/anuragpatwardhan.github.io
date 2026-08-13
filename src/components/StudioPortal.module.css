@@ -1,0 +1,170 @@
+/* Studio portal — the seam on the right edge of the homepage.
+   Everything is a fixed overlay layer. Nothing here selects, wraps or restyles
+   any existing element, so removing <StudioPortal /> removes it completely. */
+
+.seam {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 60;
+  height: 100vh;
+  height: 100svh;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: grab;
+  touch-action: pan-y; /* let vertical scrolling through; we only claim horizontal */
+  -webkit-tap-highlight-color: transparent;
+}
+.seam:active {
+  cursor: grabbing;
+}
+
+/* The glowing hairline itself. */
+.line {
+  position: absolute;
+  top: 12vh;
+  bottom: 12vh;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(216, 255, 58, 0.15) 18%,
+    rgba(216, 255, 58, 0.55) 50%,
+    rgba(216, 255, 58, 0.15) 82%,
+    transparent
+  );
+  box-shadow: 0 0 12px rgba(216, 255, 58, 0.35);
+  animation: breathe 4.5s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.orb {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 0, 0, 0.72);
+  border: 1px solid rgba(216, 255, 58, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease, background 0.35s ease;
+}
+.orb svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: rgba(216, 255, 58, 0.9);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.seam:hover .orb,
+.seam:focus-visible .orb {
+  transform: scale(1.18);
+  border-color: rgba(216, 255, 58, 0.95);
+  background: rgba(216, 255, 58, 0.12);
+}
+
+/* Vertical label. Sits beside the orb and only appears on hover/focus so the
+   resting state stays quiet. */
+.label {
+  position: absolute;
+  right: 46px;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(216, 255, 58, 0.92);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.seam:hover .label,
+.seam:focus-visible .label,
+.dragging .label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.seam:focus-visible {
+  outline: 2px solid rgba(216, 255, 58, 0.9);
+  outline-offset: -6px;
+  border-radius: 10px;
+}
+
+/* The incoming world, revealed under the drag. Width tracks the pointer, so the
+   visitor is literally pulling the seam open. */
+.reveal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 59;
+  width: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 45% at 30% 25%, rgba(255, 77, 157, 0.5), transparent 70%),
+    radial-gradient(55% 50% at 80% 35%, rgba(34, 211, 238, 0.42), transparent 72%),
+    radial-gradient(70% 60% at 50% 85%, rgba(139, 92, 246, 0.55), transparent 74%),
+    linear-gradient(180deg, #0a0618, #05030f);
+}
+.revealInner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.revealWord {
+  font-size: clamp(1rem, 3vw, 2rem);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 255, 0.9);
+  white-space: nowrap;
+}
+
+/* Full-screen wipe played on commit, before navigation. */
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 30% 25%, rgba(255, 77, 157, 0.5), transparent 70%),
+    radial-gradient(55% 50% at 80% 35%, rgba(34, 211, 238, 0.42), transparent 72%),
+    radial-gradient(70% 60% at 50% 85%, rgba(139, 92, 246, 0.55), transparent 74%),
+    linear-gradient(180deg, #0a0618, #05030f);
+  clip-path: circle(0% at 100% 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line { animation: none; }
+  .orb, .label { transition: none; }
+}
+
+/* On touch the seam is a wider swipe target but the label stays hidden until
+   the drag starts, so it never covers content. */
+@media (pointer: coarse) {
+  .seam { width: 30px; }
+  .label { right: 38px; }
+}
+
+/* Printing should never include the portal. */
+@media print {
+  .seam, .reveal, .wipe { display: none !important; }
+}
