@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Anurag Patwardhan — Studio</title>
+<meta name="description" content="Product design and product engineering work by Anurag Patwardhan — interfaces, systems and digital products." />
+<meta name="theme-color" content="#05030f" />
+
+<meta property="og:title" content="Anurag Patwardhan — Studio" />
+<meta property="og:description" content="Product design and product engineering — interfaces, systems and digital products." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://anuragpatwardhan.github.io/studio/" />
+
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="./studio.css" />
+</head>
+
+<body>
+  <!-- Aurora field. Fixed behind everything; falls back to a CSS gradient on the
+       <body> if WebGL is unavailable or reduced motion is requested. -->
+  <canvas id="aurora" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Bespoke cursor, studio-only. Hidden entirely on coarse pointers. -->
+  <div class="cursor" aria-hidden="true">
+    <div class="cursor__lens"></div>
+    <div class="cursor__dot"></div>
+  </div>
+
+  <a class="skip" href="#products">Skip to products</a>
+
+  <header class="topbar">
+    <a class="back" href="/" data-cursor="link">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+      <span>back to dev</span>
+    </a>
+    <span class="topbar__mark">STUDIO</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero__inner">
+        <p class="eyebrow reveal">Product Design &amp; Product Engineering</p>
+        <h1 class="hero__name reveal">
+          <span class="line">Anurag</span>
+          <span class="line"><em>Patwardhan</em></span>
+        </h1>
+        <p class="hero__statement reveal">
+          I design and build digital products end to end — from the first rough
+          prototype to the shipped interface, its design system, and the code
+          underneath.
+        </p>
+        <a class="scroll-cue reveal" href="#products" data-cursor="link">
+          <span>digital products</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
+        </a>
+      </div>
+    </section>
+
+    <section class="approach" id="approach">
+      <h2 class="section-title reveal">How I work</h2>
+      <ol class="approach__list" id="approach-list"></ol>
+    </section>
+
+    <section class="products" id="products">
+      <div class="section-head">
+        <h2 class="section-title reveal">Digital Products</h2>
+        <p class="section-sub reveal">
+          Things I have designed and built. Each opens its own site.
+        </p>
+      </div>
+      <ul class="cards" id="cards"></ul>
+    </section>
+
+    <section class="capabilities" id="capabilities">
+      <h2 class="section-title reveal">Capabilities</h2>
+      <ul class="cap-grid" id="cap-grid"></ul>
+    </section>
+
+    <section class="cta" id="contact">
+      <h2 class="cta__title reveal">Building something that deserves care?</h2>
+      <div class="cta__actions reveal">
+        <a class="btn btn--primary" href="/contact/" data-cursor="link">Start a conversation</a>
+        <a class="btn" href="/" data-cursor="link">See the engineering side</a>
+      </div>
+      <footer class="foot">
+        <span>© <span id="year"></span> Anurag Patwardhan</span>
+        <span class="foot__hint">Press <kbd>Esc</kbd> to return to the dev portfolio</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="./studio.js" defer></script>
+</body>
+</html>

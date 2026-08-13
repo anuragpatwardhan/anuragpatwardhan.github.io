@@ -1,0 +1,654 @@
+/* ============================================================================
+   Studio — deep-space aurora
+   Standalone. Nothing here is shared with the Next.js portfolio; this page is
+   served straight out of /public, so no app styles reach it and none of this
+   leaks back.
+   ========================================================================= */
+
+:root {
+  --void: #05030f;
+  --void-2: #0a0618;
+
+  /* Aurora palette. These are mirrored in the shader (studio.js, PALETTE) —
+     change both together if you want a different colour story. */
+  --magenta: #ff4d9d;
+  --violet: #8b5cf6;
+  --cyan: #22d3ee;
+  --amber: #ffb347;
+  --lime: #a3e635;
+
+  --ink: #f4f1ff;
+  --ink-soft: rgba(244, 241, 255, 0.66);
+  --ink-faint: rgba(244, 241, 255, 0.38);
+  --hairline: rgba(244, 241, 255, 0.12);
+
+  --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --page: min(1180px, 92vw);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Fallback field. The shader paints over this; when WebGL is missing or the
+   visitor prefers reduced motion, this is what they see instead — so it has to
+   stand on its own rather than being a flat colour. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60% 45% at 18% 22%, rgba(255, 77, 157, 0.4), transparent 70%),
+    radial-gradient(55% 50% at 82% 30%, rgba(34, 211, 238, 0.34), transparent 72%),
+    radial-gradient(70% 60% at 50% 88%, rgba(139, 92, 246, 0.42), transparent 74%),
+    radial-gradient(40% 35% at 70% 70%, rgba(255, 179, 71, 0.22), transparent 70%),
+    linear-gradient(180deg, var(--void-2), var(--void));
+}
+
+canvas#aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease);
+}
+canvas#aurora.ready {
+  opacity: 1;
+}
+
+/* Film grain. Breaks up gradient banding, which is very visible on wide dark
+   fields, and adds the printed-matter texture the type is going for. */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 6s steps(6) infinite;
+}
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -3%); }
+  60% { transform: translate(-2%, -2%); }
+  80% { transform: translate(3%, 1%); }
+}
+
+/* ---------------------------------------------------------------- cursor -- */
+/* Only shown for fine pointers; touch devices get their native behaviour. */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.cursor.is-visible {
+  opacity: 1;
+}
+.cursor__lens {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border: 1px solid rgba(244, 241, 255, 0.5);
+  border-radius: 50%;
+  /* Inverts whatever aurora sits under it, so the cursor reads as a lens over
+     the field rather than a dot painted on top of it. */
+  backdrop-filter: invert(1) hue-rotate(90deg) saturate(1.6);
+  -webkit-backdrop-filter: invert(1) hue-rotate(90deg) saturate(1.6);
+  transition: width 0.35s var(--ease), height 0.35s var(--ease),
+    margin 0.35s var(--ease), border-color 0.35s var(--ease), opacity 0.3s var(--ease);
+}
+.cursor__dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.cursor.is-hover .cursor__lens {
+  width: 86px;
+  height: 86px;
+  margin: -43px 0 0 -43px;
+  border-color: rgba(255, 77, 157, 0.8);
+}
+.cursor.is-hover .cursor__dot {
+  opacity: 0;
+}
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor { display: none; }
+}
+/* Only hide the native cursor once ours is actually running. */
+body.has-custom-cursor,
+body.has-custom-cursor a,
+body.has-custom-cursor button {
+  cursor: none;
+}
+
+/* ------------------------------------------------------------------ chrome -- */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--ink);
+  color: var(--void);
+  border-radius: 0 0 8px 0;
+}
+.skip:focus {
+  left: 0;
+}
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+  mix-blend-mode: difference;
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: gap 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+.back svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.3s var(--ease);
+}
+.back:hover {
+  gap: 0.9rem;
+}
+.back:hover svg {
+  transform: translateX(-4px);
+}
+.topbar__mark {
+  font-size: 0.82rem;
+  letter-spacing: 0.34em;
+  color: var(--ink-faint);
+}
+
+/* -------------------------------------------------------------------- hero -- */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 7rem 0 4rem;
+}
+.hero__inner {
+  width: var(--page);
+  text-align: center;
+}
+.eyebrow {
+  margin: 0 0 1.6rem;
+  font-size: clamp(0.68rem, 1.4vw, 0.8rem);
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero__name {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  font-size: clamp(3.4rem, 15vw, 11rem);
+}
+.hero__name .line {
+  display: block;
+}
+.hero__name em {
+  font-style: italic;
+  /* The one place the full palette shows up in type. */
+  background: linear-gradient(
+    100deg,
+    var(--magenta) 0%,
+    var(--amber) 26%,
+    var(--lime) 48%,
+    var(--cyan) 72%,
+    var(--violet) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: drift 18s ease-in-out infinite;
+}
+@keyframes drift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.hero__statement {
+  margin: 2.2rem auto 0;
+  max-width: 46ch;
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  color: var(--ink-soft);
+}
+.scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 4rem;
+  color: var(--ink-faint);
+  text-decoration: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  transition: color 0.3s var(--ease);
+}
+.scroll-cue:hover {
+  color: var(--ink);
+}
+.scroll-cue svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: bob 2.4s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+/* --------------------------------------------------------------- sections -- */
+section {
+  position: relative;
+  z-index: 1;
+}
+.approach,
+.products,
+.capabilities,
+.cta {
+  width: var(--page);
+  margin: 0 auto;
+  padding: clamp(5rem, 12vw, 9rem) 0;
+}
+.section-title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 5.5vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+.section-sub {
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------------------- approach -- */
+.approach__list {
+  counter-reset: step;
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--hairline);
+  border-block: 1px solid var(--hairline);
+}
+@media (min-width: 780px) {
+  .approach__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.approach__item {
+  counter-increment: step;
+  background: rgba(5, 3, 15, 0.55);
+  padding: 2.2rem clamp(1.2rem, 3vw, 2.2rem);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background 0.4s var(--ease);
+}
+.approach__item:hover {
+  background: rgba(139, 92, 246, 0.12);
+}
+.approach__item h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1.06rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.approach__item h3::before {
+  content: counter(step, decimal-leading-zero);
+  display: block;
+  margin-bottom: 1.6rem;
+  font-family: var(--display);
+  font-size: 1.9rem;
+  color: var(--magenta);
+}
+.approach__item p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+/* ------------------------------------------------------------------- cards -- */
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.6rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(10, 6, 24, 0.5);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.5s var(--ease), border-color 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.card--live:hover,
+.card--live:focus-visible {
+  transform: translateY(-6px);
+  border-color: rgba(255, 77, 157, 0.55);
+  box-shadow: 0 22px 60px -24px rgba(255, 77, 157, 0.55);
+}
+.card--soon {
+  cursor: default;
+}
+.card__thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: linear-gradient(140deg, rgba(139, 92, 246, 0.3), rgba(34, 211, 238, 0.18));
+}
+.card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s var(--ease);
+}
+.card--live:hover .card__thumb img {
+  transform: scale(1.05);
+}
+/* Monogram stands in until a real thumbnail is supplied, so a card without an
+   image still looks deliberate rather than broken. */
+.card__mono {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 3.4rem;
+  color: rgba(244, 241, 255, 0.9);
+  letter-spacing: -0.02em;
+}
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.4rem 1.4rem 1.6rem;
+  flex: 1;
+}
+.card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.card__title {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.card__arrow {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  fill: none;
+  stroke: var(--ink-faint);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.4s var(--ease), stroke 0.4s var(--ease);
+}
+.card--live:hover .card__arrow {
+  transform: translate(3px, -3px);
+  stroke: var(--magenta);
+}
+.card__tagline {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  flex: 1;
+}
+.card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+.tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  color: var(--ink-faint);
+}
+.badge {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 2;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.34rem 0.66rem;
+  border-radius: 999px;
+  background: rgba(5, 3, 15, 0.72);
+  border: 1px solid var(--hairline);
+  color: var(--ink-faint);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ------------------------------------------------------------ capabilities -- */
+.cap-grid {
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+.cap {
+  background: rgba(5, 3, 15, 0.55);
+  padding: 1.7rem 1.5rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.cap h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.96rem;
+  font-weight: 500;
+}
+.cap p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+/* --------------------------------------------------------------------- cta -- */
+.cta {
+  text-align: center;
+}
+.cta__title {
+  margin: 0 auto;
+  max-width: 18ch;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1.02;
+}
+.cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  justify-content: center;
+  margin-top: 2.6rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9rem 1.7rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  transition: border-color 0.35s var(--ease), background 0.35s var(--ease),
+    transform 0.35s var(--ease);
+}
+.btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(244, 241, 255, 0.4);
+  background: rgba(244, 241, 255, 0.06);
+}
+.btn--primary {
+  background: var(--ink);
+  color: var(--void);
+  border-color: var(--ink);
+}
+.btn--primary:hover {
+  background: #fff;
+  border-color: #fff;
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.4rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: clamp(4rem, 10vw, 7rem);
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+  text-align: left;
+}
+kbd {
+  font: inherit;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+}
+
+/* ------------------------------------------------------------------ reveal -- */
+/* Content is visible by default and only hidden once JS has added .js-reveal to
+   <html>. If the script fails to load or throws, the page still reads normally
+   instead of staying blank waiting for a class that will never arrive.
+
+   The reveal itself is a forwards-filling animation rather than a transition:
+   a transition can be left mid-flight if the element is re-composited, which
+   strands it at opacity 0. An animation always settles on its final frame. */
+.js-reveal :is(.reveal, .card, .approach__item, .cap) {
+  opacity: 0;
+}
+.js-reveal :is(.reveal, .card, .approach__item, .cap).in {
+  animation: revealIn 0.9s var(--ease) forwards;
+}
+@keyframes revealIn {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+:where(a, button):focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* Reduced motion: hold everything still and reveal content immediately, so the
+   page is never left invisible waiting for an animation that will not run. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .grain { animation: none; }
+  .hero__name em { animation: none; }
+  .scroll-cue svg { animation: none; }
+  .js-reveal :is(.reveal, .card, .approach__item, .cap) {
+    opacity: 1;
+    animation: none;
+  }
+  * { transition-duration: 0.01ms !important; }
+}
