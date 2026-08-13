@@ -23,11 +23,17 @@
   --hairline: rgba(244, 241, 255, 0.12);
 
   /* Display face for the wordmark and section headings. Deliberately the same
-     family as the body copy, set in caps at 700 — one voice across the page
-     rather than a separate display face competing with it. Space Grotesk tops
-     out at 700, so headings read lighter than a black display face would; the
-     size and tracking below compensate. */
+     family as the body copy — one voice across the page rather than a separate
+     display face competing with it. Weight and tracking are set just below. */
   --display: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Display type treatment, in one place so it can be tuned or reverted without
+     touching individual rules.
+       Previous heavy lockup:  --display-weight: 700;  --display-track: -0.03em;
+       Current airy treatment: --display-weight: 400;  --display-track:  0.07em;
+     Note the two move together — widening the tracking without dropping the
+     weight makes the mark look bloated rather than open. */
+  --display-weight: 400;
+  --display-track: 0.07em;
   /* Serif kept for the hero claim only, as deliberate contrast against the
      grotesque above it. */
   --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
@@ -248,16 +254,14 @@ body.has-custom-cursor button {
 .hero__name {
   margin: 0;
   font-family: var(--display);
-  font-weight: 700;
+  font-weight: var(--display-weight);
   text-transform: uppercase;
   line-height: 0.92;
-  /* Caps at display size always look loose by default. This pulls them into a
-     single locked-up mark rather than a row of separate letters. */
-  letter-spacing: -0.03em;
+  letter-spacing: var(--display-track);
   /* Sized off the viewport width so the mark never wraps; it has to hold as a
      single unbroken unit to read as an address. Space Grotesk caps are far
      wider than a condensed face, so this runs smaller to still fit 375px. */
-  font-size: clamp(1.7rem, 8.1vw, 6.2rem);
+  font-size: clamp(1.5rem, 7vw, 5.4rem);
   white-space: nowrap;
 }
 .hero__name .mark {
@@ -353,11 +357,11 @@ section {
 .section-title {
   margin: 0;
   font-family: var(--display);
-  font-weight: 700;
+  font-weight: var(--display-weight);
   text-transform: uppercase;
-  font-size: clamp(1.8rem, 5vw, 3.2rem);
-  line-height: 0.95;
-  letter-spacing: -0.025em;
+  font-size: clamp(1.6rem, 4.4vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: var(--display-track);
 }
 .section-head {
   display: flex;
@@ -411,9 +415,9 @@ section {
   display: block;
   margin-bottom: 1.6rem;
   font-family: var(--display);
-  font-weight: 700;
+  font-weight: var(--display-weight);
   font-size: 2.1rem;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--display-track);
   color: var(--magenta);
 }
 .approach__item p {
@@ -480,10 +484,10 @@ section {
   display: grid;
   place-items: center;
   font-family: var(--display);
-  font-weight: 700;
+  font-weight: var(--display-weight);
   font-size: 3.1rem;
   color: rgba(244, 241, 255, 0.9);
-  letter-spacing: -0.04em;
+  letter-spacing: var(--display-track);
 }
 .card__body {
   display: flex;
@@ -595,11 +599,11 @@ section {
   margin: 0 auto;
   max-width: 20ch;
   font-family: var(--display);
-  font-weight: 700;
+  font-weight: var(--display-weight);
   text-transform: uppercase;
-  font-size: clamp(1.9rem, 5.4vw, 3.6rem);
-  line-height: 0.96;
-  letter-spacing: -0.025em;
+  font-size: clamp(1.7rem, 4.6vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: var(--display-track);
   text-wrap: balance;
 }
 .cta__actions {
