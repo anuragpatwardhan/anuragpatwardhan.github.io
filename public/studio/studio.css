@@ -264,7 +264,7 @@ body.has-custom-cursor button {
   display: inline-block;
 }
 .hero__name em {
-  /* Anton has no true italic, and a synthesised oblique on a face this heavy
+  /* Space Grotesk ships no true italic, and a synthesised oblique on bold caps
      smears the verticals. The gradient alone separates the suffix. */
   font-style: normal;
   /* The one place the full palette shows up in type. */
