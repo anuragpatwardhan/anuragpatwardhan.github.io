@@ -233,16 +233,23 @@ body.has-custom-cursor button {
   text-transform: uppercase;
   color: var(--ink-faint);
 }
+/* The wordmark deliberately mirrors ANURAG.DEV on the engineering side: same
+   word.tld structure, different voice. That side is heavy uppercase sans; this
+   one is a serif with the suffix in italic, so the two read as one identity
+   seen from two rooms rather than two unrelated brands. */
 .hero__name {
   margin: 0;
   font-family: var(--display);
   font-weight: 400;
-  line-height: 0.88;
-  letter-spacing: -0.02em;
-  font-size: clamp(3.4rem, 15vw, 11rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  /* Sized off the viewport width so the mark never wraps; it has to hold as a
+     single unbroken unit to read as an address. */
+  font-size: clamp(2.6rem, 12.5vw, 9.5rem);
+  white-space: nowrap;
 }
-.hero__name .line {
-  display: block;
+.hero__name .mark {
+  display: inline-block;
 }
 .hero__name em {
   font-style: italic;
@@ -265,11 +272,25 @@ body.has-custom-cursor button {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
+/* The positioning claim. Promoted from a grey caption to the second-loudest
+   thing on the screen, because the wordmark states who and this states what. */
 .hero__statement {
-  margin: 2.2rem auto 0;
-  max-width: 46ch;
-  font-size: clamp(1rem, 1.7vw, 1.2rem);
-  color: var(--ink-soft);
+  margin: 2rem auto 0;
+  max-width: 24ch;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  /* Even out the line lengths so the last word is never left orphaned. */
+  text-wrap: balance;
+}
+.hero__sub {
+  margin: 1.4rem auto 0;
+  max-width: 48ch;
+  font-size: clamp(0.92rem, 1.5vw, 1.05rem);
+  color: var(--ink-faint);
 }
 .scroll-cue {
   display: inline-flex;
