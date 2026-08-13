@@ -10,6 +10,7 @@ import Education from "@/components/Education";
 import Testimonials from "@/components/Testimonials";
 import Awards from "@/components/Awards";
 import GotAnIdea from "@/components/GotAnIdea";
+import StudioPortal from "@/components/StudioPortal";
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
       <Testimonials />
       <Awards />
       <GotAnIdea />
+      <StudioPortal />
     </>
   );
 }
