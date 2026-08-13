@@ -22,11 +22,12 @@
   --ink-faint: rgba(244, 241, 255, 0.38);
   --hairline: rgba(244, 241, 255, 0.12);
 
-  /* Display grotesque for the wordmark and section headings. Heavy, wide and
-     tightly tracked in all caps — the sports-graphic register. Archivo is used
-     rather than a club typeface because those are proprietary and unlicensed
-     for a personal site; this is the closest properly-licensed match. */
-  --display: "Archivo", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Display face for the wordmark and section headings: condensed, ultra-heavy,
+     tight apertures — the team-sheet register. Anton ships a single weight that
+     is already black, so there is no font-weight to set anywhere below.
+     A club typeface would be proprietary and unlicensed for a personal site;
+     this is the closest freely-licensed match to that geometry. */
+  --display: "Anton", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
   /* Serif kept for the hero claim only, as deliberate contrast against the
      grotesque above it. */
   --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
@@ -241,28 +242,30 @@ body.has-custom-cursor button {
   color: var(--ink-faint);
 }
 /* The wordmark deliberately mirrors ANURAG.DEV on the engineering side: same
-   word.tld structure, different voice. That side is heavy uppercase sans; this
-   one is a serif with the suffix in italic, so the two read as one identity
-   seen from two rooms rather than two unrelated brands. */
+   word.tld structure, same all-caps lockup. That side is a geometric sans in
+   brand yellow; this one is a condensed display face with the suffix carrying
+   the aurora gradient — one identity seen from two rooms, not two brands. */
 .hero__name {
   margin: 0;
   font-family: var(--display);
-  font-weight: 900;
   text-transform: uppercase;
   line-height: 0.86;
-  /* Heavy grotesques need negative tracking at display size or the caps drift
-     apart and stop reading as one locked-up mark. */
-  letter-spacing: -0.035em;
+  /* Anton is already tightly spaced by design, so this only takes the edge off
+     rather than doing the heavy lifting a wider grotesque would need. */
+  letter-spacing: -0.012em;
   /* Sized off the viewport width so the mark never wraps; it has to hold as a
-     single unbroken unit to read as an address. */
-  font-size: clamp(2.1rem, 10.5vw, 8rem);
+     single unbroken unit to read as an address. Condensed letterforms fit more
+     per line, so this runs larger than a normal-width face could. */
+  font-size: clamp(2.5rem, 12.5vw, 9.5rem);
   white-space: nowrap;
 }
 .hero__name .mark {
   display: inline-block;
 }
 .hero__name em {
-  font-style: italic;
+  /* Anton has no true italic, and a synthesised oblique on a face this heavy
+     smears the verticals. The gradient alone separates the suffix. */
+  font-style: normal;
   /* The one place the full palette shows up in type. */
   background: linear-gradient(
     100deg,
@@ -349,7 +352,6 @@ section {
 .section-title {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
   text-transform: uppercase;
   font-size: clamp(1.8rem, 5vw, 3.2rem);
   line-height: 0.95;
@@ -407,7 +409,6 @@ section {
   display: block;
   margin-bottom: 1.6rem;
   font-family: var(--display);
-  font-weight: 900;
   font-size: 2.1rem;
   letter-spacing: -0.03em;
   color: var(--magenta);
@@ -476,7 +477,6 @@ section {
   display: grid;
   place-items: center;
   font-family: var(--display);
-  font-weight: 900;
   font-size: 3.1rem;
   color: rgba(244, 241, 255, 0.9);
   letter-spacing: -0.04em;
@@ -591,7 +591,6 @@ section {
   margin: 0 auto;
   max-width: 20ch;
   font-family: var(--display);
-  font-weight: 800;
   text-transform: uppercase;
   font-size: clamp(1.9rem, 5.4vw, 3.6rem);
   line-height: 0.96;
