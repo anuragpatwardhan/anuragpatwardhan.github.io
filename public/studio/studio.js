@@ -20,6 +20,14 @@
      ====================================================================== */
   const PRODUCTS = [
     {
+      title: "Competition",
+      tagline: "Streetwear storefront — CCC. Denim, tees and caps, built to compete.",
+      tags: ["Brand", "E-commerce", "WebGL"],
+      thumbnail: null,
+      url: "/competition/",
+      status: "live",
+    },
+    {
       title: "SyncSpace",
       tagline: "Real-time collaboration platform — shared canvas, live presence.",
       tags: ["Product Design", "Realtime", "Full-stack"],
