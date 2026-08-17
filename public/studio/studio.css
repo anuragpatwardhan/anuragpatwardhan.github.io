@@ -22,18 +22,20 @@
   --ink-faint: rgba(244, 241, 255, 0.38);
   --hairline: rgba(244, 241, 255, 0.12);
 
-  /* Display face for the wordmark and section headings. Deliberately the same
-     family as the body copy — one voice across the page rather than a separate
-     display face competing with it. Weight and tracking are set just below. */
-  --display: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Display face for the wordmark and section headings. Clash Display, the same
+     face the Competition storefront uses, so the studio and the product it links
+     to read as one hand rather than two unrelated sites. Loaded from Fontshare;
+     free for commercial use. */
+  --display: "Clash Display", "Arial Black", ui-sans-serif, system-ui, sans-serif;
   /* Display type treatment, in one place so it can be tuned or reverted without
-     touching individual rules.
-       Previous heavy lockup:  --display-weight: 700;  --display-track: -0.03em;
-       Current airy treatment: --display-weight: 400;  --display-track:  0.07em;
+     touching individual rules. These match the Competition storefront's own
+     `.display` rule, which is what makes the two sites feel related.
+       Clash Display ships 600 and 700 here; 700 is the storefront's weight.
+       Airy alternative tried earlier: --display-weight: 400; --display-track: 0.07em
      Note the two move together — widening the tracking without dropping the
      weight makes the mark look bloated rather than open. */
-  --display-weight: 400;
-  --display-track: 0.07em;
+  --display-weight: 700;
+  --display-track: -0.03em;
   /* Serif kept for the hero claim only, as deliberate contrast against the
      grotesque above it. */
   --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
@@ -259,9 +261,10 @@ body.has-custom-cursor button {
   line-height: 0.92;
   letter-spacing: var(--display-track);
   /* Sized off the viewport width so the mark never wraps; it has to hold as a
-     single unbroken unit to read as an address. Space Grotesk caps are far
-     wider than a condensed face, so this runs smaller to still fit 375px. */
-  font-size: clamp(1.5rem, 7vw, 5.4rem);
+     single unbroken unit to read as an address. The value is set by measuring
+     the rendered mark against a 375px viewport, so it changes whenever the
+     display face or tracking does. */
+  font-size: clamp(1.5rem, 7.6vw, 5.9rem);
   white-space: nowrap;
 }
 .hero__name .mark {
