@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { blogs } from "@/data/blogs";
+import { nextBySlug } from "@/lib/navigation";
 import Reveal from "@/components/motion/Reveal";
 import type { Metadata } from "next";
 
@@ -24,8 +25,13 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const post = blogs.find((b) => b.slug === slug);
   if (!post || post.external) notFound();
 
-  const idx = blogs.findIndex((b) => b.slug === slug);
-  const next = blogs.filter((b) => !b.external && b.slug !== slug)[0];
+  // Cycle through the posts that have a page here, skipping the ones that link
+  // out. Taking the first other post instead — as this did — meant the chain
+  // bounced between the first two and never reached the rest.
+  const next = nextBySlug(
+    blogs.filter((b) => !b.external),
+    slug
+  );
 
   return (
     <main className="bg-[#050000] text-white">

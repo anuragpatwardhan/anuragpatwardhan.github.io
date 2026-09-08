@@ -1,6 +1,6 @@
 # Anurag Patwardhan — Portfolio
 
-Next.js 15 + Tailwind v4. Static export → GitHub Pages. Contact form delivered to your inbox via Web3Forms (no backend).
+Next.js 16 + Tailwind v4. Static export → GitHub Pages. Contact form delivered to your inbox via Web3Forms (no backend).
 
 ## Run locally
 
@@ -40,7 +40,27 @@ The Actions workflow at `.github/workflows/deploy.yml` builds and publishes on e
 
 ## Editing content
 
-All copy lives in `src/data/site.ts` — name, email, projects, skills, experience, testimonials, awards. Edit there, no component changes needed.
+All copy lives in `src/data/site.ts` — name, email, projects, skills, experience, testimonials, awards. Edit there, no component changes needed. Case studies live in `src/data/projectDetails.ts` and posts in `src/data/blogs.ts`.
+
+## Tests
+
+```bash
+npm test
+```
+
+30 cases. A static content site does not fail loudly — a slug listed on an index page with
+no detail entry behind it is a dead link, and a mistyped image path is an empty box. Both
+survive `next build`, so the tests check the things the build does not:
+
+- **Content integrity** — slugs unique and URL-safe, every project card with a link having
+  a case study behind it, card and case-study names agreeing (they are separate data and
+  can drift), every local image resolving to a real file under `public/`, nav entries
+  pointing at routes that exist, and internally hosted posts carrying a body while
+  external ones carry an absolute URL.
+- **Next / previous navigation** — that following "read next" from any starting point
+  reaches *every* post rather than cycling between two of them. This is what the blog page
+  was getting wrong: it offered the first other post, which is indistinguishable from
+  correct on two posts and stranded the third.
 
 ## Swap in your real images
 

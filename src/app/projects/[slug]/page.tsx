@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projectDetails, getProjectBySlug } from "@/data/projectDetails";
+import { nextBySlug } from "@/lib/navigation";
 import Reveal from "@/components/motion/Reveal";
 import type { Metadata } from "next";
 
@@ -32,8 +33,7 @@ export default async function ProjectDetailPage({
   const project = getProjectBySlug(slug);
   if (!project) notFound();
 
-  const idx = projectDetails.findIndex((p) => p.slug === slug);
-  const next = projectDetails[(idx + 1) % projectDetails.length];
+  const next = nextBySlug(projectDetails, slug);
 
   return (
     <main className="bg-[#050000] text-white">
@@ -287,20 +287,23 @@ export default async function ProjectDetailPage({
         <p className="text-white/80 text-lg md:text-xl leading-relaxed">{project.pitch}</p>
       </Section>
 
-      {/* Next project */}
-      <section className="py-20 md:py-28 bg-gradient-to-b from-[#050000] to-black border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-6 md:px-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <div>
-            <p className="text-xs tracking-[0.18em] uppercase text-white/50">Next project</p>
-            <h3 className="display mt-3 text-4xl md:text-6xl text-[#ede1e1]">{next.name}</h3>
-            <p className="mt-2 text-white/70 max-w-md">{next.tagline}</p>
+      {/* Next project. Hidden when there is only one case study, rather than
+          linking back to the page you are already reading. */}
+      {next && (
+        <section className="py-20 md:py-28 bg-gradient-to-b from-[#050000] to-black border-t border-white/10">
+          <div className="max-w-6xl mx-auto px-6 md:px-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div>
+              <p className="text-xs tracking-[0.18em] uppercase text-white/50">Next project</p>
+              <h3 className="display mt-3 text-4xl md:text-6xl text-[#ede1e1]">{next.name}</h3>
+              <p className="mt-2 text-white/70 max-w-md">{next.tagline}</p>
+            </div>
+            <Link href={`/projects/${next.slug}`} className="btn btn-primary">
+              <span>View case study</span>
+              <ArrowOut />
+            </Link>
           </div>
-          <Link href={`/projects/${next.slug}`} className="btn btn-primary">
-            <span>View case study</span>
-            <ArrowOut />
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
     </main>
   );
 }
